@@ -1,0 +1,99 @@
+# Environment files and secrets
+.env
+.env.*
+!.env.example
+!.env.*.example
+*.pem
+*.key
+*.p8
+*.p12
+*.jks
+*.keystore
+*.crt
+*.cer
+*.asc
+
+# Java / Gradle
+.gradle/
+**/.gradle/
+build/
+**/build/
+!**/gradle/wrapper/gradle-wrapper.jar
+!**/src/main/**/build/
+!**/src/test/**/build/
+out/
+**/out/
+!**/src/main/**/out/
+!**/src/test/**/out/
+bin/
+**/bin/
+!**/src/main/**/bin/
+!**/src/test/**/bin/
+
+# Node / Vite
+node_modules/
+**/node_modules/
+dist/
+**/dist/
+*.tsbuildinfo
+vite.config.js
+vite.config.d.ts
+
+# Test and browser artifacts
+test-results/
+**/test-results/
+playwright-report/
+**/playwright-report/
+blob-report/
+**/blob-report/
+coverage/
+**/coverage/
+.nyc_output/
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+hs_err_pid*
+replay_pid*
+
+# Uploads and generated local files
+UploadFolder/
+**/UploadFolder/
+uploads/
+**/uploads/
+tmp/
+temp/
+*.tmp
+
+# Local performance outputs
+perf-results/
+**/perf-results/
+*.jfr
+*.hprof
+
+# IDEs and editors
+.idea/
+.vscode/
+*.iws
+*.iml
+*.ipr
+.classpath
+.factorypath
+.project
+.settings/
+.apt_generated/
+.springBeans
+.sts4-cache/
+.metadata/
+
+# OS files
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Legacy local report folder
+Md_report/
