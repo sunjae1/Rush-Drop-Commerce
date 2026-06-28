@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Edit Category</title>
+    <link rel="stylesheet" th:href="@{/style.css}">
+</head>
+<body>
+
+<header>
+    <h1>My Shopping Mall</h1>
+</header>
+
+<nav>
+    <div class="nav-links">
+        <a th:href="@{/}">홈</a>
+        <a th:href="@{/items}">상품 관리 페이지</a>
+    <a th:href="@{/categories}">카테고리</a>
+        <a th:href="@{/posts}">게시판</a>
+    </div>
+    <div class="user-actions">
+        <!-- 장바구니 아이콘 (항상 표시) -->
+        <a th:href="@{/items/cartAll}" class="nav-icon-link">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"></path><line x1="3" y1="6" x2="21" y2="6"></line><path d="M16 10a4 4 0 0 1-8 0"></path></svg>
+        </a>
+        <!-- 프로필 아이콘 및 드롭다운 메뉴 -->
+        <div class="profile-menu-container">
+            <button class="nav-icon-link profile-icon-btn">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+            </button>
+            <div class="dropdown-menu">
+                <!-- 로그인 안된 경우 -->
+                <div th:if="${user == null}">
+                    <a th:href="@{/login}" class="dropdown-item">로그인</a>
+                    <a th:href="@{/register}" class="dropdown-item">회원가입</a>
+                </div>
+                <!-- 로그인 된 경우 -->
+                <div th:if="${user != null}">
+                    <div class="dropdown-header" th:text="${user.name} + '님'">사용자 이름</div>
+                    <a th:href="@{/mypage}" class="dropdown-item">마이 페이지</a>
+                    <a th:href="@{/items/orderAll}" class="dropdown-item">주문 내역</a>
+                    <form th:action="@{/logout}" method="post">
+                        <button type="submit" class="dropdown-item btn-link">로그아웃</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</nav>
+
+<div class="container">
+    <div class="form-container">
+        <h2 class="form-title">카테고리 수정</h2>
+
+        <form th:action="@{|/categories/${category.id}/edit|}" th:object="${category}" method="post">
+            <input type="hidden" th:field="*{id}" />
+            <div class="form-group">
+                <label for="name">카테고리 이름</label>
+                <input type="text" id="name" th:field="*{name}" class="form-input" placeholder="Enter category name">
+                <div class="field-error" th:errors="*{name}"></div>
+            </div>
+
+            <div class="button-container">
+                <button th:onclick="|location.href='@{/categories}'|" type="button" class="btn btn-secondary">취소</button>
+                <button type="submit" class="btn btn-primary">저장</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!--공통 푸터-->
+<footer th:replace="~{fragments/footer :: footer}"></footer>
+
+<div th:replace="~{fragments/script :: script}"></div>
+
+</body>
+</html>

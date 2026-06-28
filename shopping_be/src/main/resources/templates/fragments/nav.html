@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<nav th:fragment="nav">
+    <div class="nav-links">
+        <a th:href="@{/}">홈</a>
+        <a th:href="@{/categories}">카테고리</a>
+        <a th:href="@{/items}">상품 관리 페이지</a>
+        <a th:href="@{/posts}">게시판</a>
+    </div>
+    <div class="user-actions">
+        <!-- 장바구니 아이콘 (항상 표시) -->
+        <a th:href="@{/items/cartAll}" class="nav-icon-link">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"></path><line x1="3" y1="6" x2="21" y2="6"></line><path d="M16 10a4 4 0 0 1-8 0"></path></svg>
+        </a>
+        <!-- 프로필 아이콘 및 드롭다운 메뉴 -->
+        <div class="profile-menu-container">
+            <button class="nav-icon-link profile-icon-btn">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+            </button>
+            <div class="dropdown-menu">
+                <!-- 로그인 안된 경우 -->
+                <div sec:authorize="isAnonymous()">
+                    <a th:href="@{/login}" class="dropdown-item">로그인</a>
+                    <a th:href="@{/register}" class="dropdown-item">회원가입</a>
+                </div>
+                <!-- 로그인 된 경우 -->
+                <div sec:authorize="isAuthenticated()">
+                    <div class="dropdown-header" th:text="${#authentication.principal.username} + '님'">사용자 이름</div>
+                    <a th:href="@{/mypage}" class="dropdown-item">마이 페이지</a>
+                    <a th:href="@{/items/orderAll}" class="dropdown-item">주문 내역</a>
+                    <form th:action="@{/logout}" method="post">
+                        <button type="submit" class="dropdown-item btn-link">로그아웃</button>
+                        <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</nav>
+</html>

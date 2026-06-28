@@ -1,0 +1,65 @@
+services:
+  mysql:
+    image: mysql:8.0
+    container_name: shopping-mysql-perf
+    ports:
+      - "3307:3306"
+    env_file:
+      - ./.env.perf
+    command:
+      - --performance-schema=ON
+      - --slow_query_log=ON
+      - --long_query_time=0.2
+      - --log_output=TABLE
+    volumes:
+      - mysql-perf-data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD-SHELL", "mysqladmin ping -h localhost -uroot -p$$MYSQL_ROOT_PASSWORD"]
+      interval: 10s
+      timeout: 5s
+      retries: 12
+
+  redis:
+    image: redis:7-alpine
+    container_name: shopping-redis-perf
+    ports:
+      - "6380:6379"
+    volumes:
+      - redis-perf-data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 3s
+      retries: 10
+
+  app:
+    build: .
+    container_name: shopping-app-perf
+    ports:
+      - "8080:8080"
+    env_file:
+      - ./.env.perf
+    environment:
+      SPRING_PROFILES_ACTIVE: perf
+      REDIS_HOST: redis
+      DB_URL: jdbc:mysql://mysql:3306/myshopping_perf?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC&characterEncoding=UTF-8
+    depends_on:
+      mysql:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+
+  k6:
+    image: grafana/k6:0.49.0
+    container_name: shopping-k6
+    profiles: ["tools"]
+    working_dir: /work
+    volumes:
+      - ./:/work
+    environment:
+      BASE_URL: http://app:8080
+    entrypoint: ["k6"]
+
+volumes:
+  mysql-perf-data:
+  redis-perf-data:

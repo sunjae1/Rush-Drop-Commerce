@@ -97,3 +97,7 @@ desktop.ini
 
 # Legacy local report folder
 Md_report/
+
+# Frontend E2E
+**/*-snapshots/
+**/*.spec.ts-snapshots/

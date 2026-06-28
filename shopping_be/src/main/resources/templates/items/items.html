@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Product Management</title>
+    <link rel="stylesheet" th:href="@{/style.css}">
+</head>
+<body>
+
+<header>
+    <h1>My Shopping Mall</h1>
+</header>
+
+<nav>
+    <div class="nav-links">
+        <a th:href="@{/}">홈</a>
+        <a th:href="@{/items}">상품 관리 페이지</a>
+    <a th:href="@{/categories}">카테고리</a>
+        <a th:href="@{/posts}">게시판</a>
+    </div>
+    <div class="user-actions">
+        <!-- 장바구니 아이콘 (항상 표시) -->
+        <a th:href="@{/items/cartAll}" class="nav-icon-link">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"></path><line x1="3" y1="6" x2="21" y2="6"></line><path d="M16 10a4 4 0 0 1-8 0"></path></svg>
+        </a>
+        <!-- 프로필 아이콘 및 드롭다운 메뉴 -->
+        <div class="profile-menu-container">
+            <button class="nav-icon-link profile-icon-btn">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+            </button>
+            <div class="dropdown-menu">
+                <!-- 로그인 안된 경우 -->
+                <div th:if="${user == null}">
+                    <a th:href="@{/login}" class="dropdown-item">로그인</a>
+                    <a th:href="@{/register}" class="dropdown-item">회원가입</a>
+                </div>
+                <!-- 로그인 된 경우 -->
+                <div th:if="${user != null}">
+                    <div class="dropdown-header" th:text="${user.name} + '님'">사용자 이름</div>
+                    <a th:href="@{/mypage}" class="dropdown-item">마이 페이지</a>
+                    <a th:href="@{/items/orderAll}" class="dropdown-item">주문 내역</a>
+                    <form th:action="@{/logout}" method="post">
+                        <button type="submit" class="dropdown-item btn-link">로그아웃</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</nav>
+
+<div class="container">
+
+    <div class="page-header">
+        <h2 class="page-title">관리자용 상품 관리 페이지</h2>
+        <a th:href="@{/items/add}" class="btn btn-primary">새 상품 등록</a>
+    </div>
+
+    <!-- 검색 폼 추가 시작 -->
+    <div class="search-form-container">
+        <form th:action="@{/items}" method="get" class="search-form">
+            <input type="hidden" name="categoryId" th:value="${param.categoryId}">
+            <input type="text" name="keyword" th:value="${param.keyword}" placeholder="상품 이름 검색">
+            <button type="submit" class="btn btn-search">검색</button>
+        </form>
+    </div>
+
+    <div class="search-form-container">
+        <a th:href="@{/items}" class="btn btn-secondary btn-sm">전체 카테고리</a>
+        <a th:each="category : ${categories}"
+           th:href="@{/items(categoryId=${category.id}, keyword=${param.keyword})}"
+           class="btn btn-secondary btn-sm"
+           th:text="${category.name}">
+            카테고리
+        </a>
+    </div>
+    <!-- 검색 폼 추가 끝 -->
+
+    <p class="field-error" th:if="${errorPV}" th:text="${errorPV}"></p>
+
+    <div class="table-container">
+        <div class="table-responsive">
+            <table class="order-table">
+                <thead>
+                <tr>
+                    <th>상품 사진</th>
+                    <th>상품 ID</th>
+                    <th>카테고리</th>
+                    <th>상품 이름</th>
+                    <th>상품 가격</th>
+                    <th>상품 재고</th>
+                    <th>수정/삭제</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="item : ${items}">
+                    <td>
+                        <img th:src="@{${item.imageUrl}}" alt="Item Image" class="item-image-thumbnail">
+                    </td>
+                    <td th:text="${item.id}">1</td>
+                    <td th:text="${item.categoryName != null ? item.categoryName : '미분류'}">미분류</td>
+                    <td class="item-name">
+                        <a th:href="@{|/items/${item.id}|}" th:text="${item.itemName}">Item Name</a>
+                    </td>
+                    <td th:text="${#numbers.formatInteger(item.price, 0, 'COMMA')}+ '원'">10000</td>
+                    <td th:text="${#numbers.formatInteger(item.quantity, 0, 'COMMA')}+ '개'">10</td>
+                    <td>
+                        <div class="action-buttons">
+                            <a th:href="@{|/items/${item.id}/edit|}" class="btn btn-secondary btn-sm">수정</a>
+                            <form th:action="@{|/items/${item.id}/delete|}" method="post" style="display: inline;">
+                                <button type="submit" class="btn btn-secondary btn-sm">삭제</button>
+                            </form>
+                        </div>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+</div>
+
+<!--공통 푸터-->
+<footer th:replace="~{fragments/footer :: footer}"></footer>
+
+<div th:replace="~{fragments/script :: script}"></div>
+
+</body>
+</html>

@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<div th:fragment="script">
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const profileBtn = document.querySelector('.profile-icon-btn');
+            const dropdownMenu = document.querySelector('.dropdown-menu');
+
+            if (profileBtn) {
+                profileBtn.addEventListener('click', function (event) {
+                    event.stopPropagation(); // 이벤트 버블링 중단
+                    dropdownMenu.classList.toggle('active');
+                });
+            }
+
+            // 문서 전체를 클릭했을 때 드롭다운이 열려 있으면 닫기
+            document.addEventListener('click', function (event) {
+                if (dropdownMenu && dropdownMenu.classList.contains('active')) {
+                    dropdownMenu.classList.remove('active');
+                }
+            });
+
+            // 드롭다운 메뉴 자체를 클릭했을 때는 닫히지 않도록 함
+            if (dropdownMenu) {
+                dropdownMenu.addEventListener('click', function (event) {
+                    event.stopPropagation();
+                });
+            }
+        });
+    </script>
+</div>
+</html>

@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title th:text="${post.title}">Post Title</title>
+    <link rel="stylesheet" th:href="@{/style.css}">
+    <style>
+        .comment-edit-form {
+            background-color: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 10px;
+            border: 1px solid #e9ecef;
+        }
+
+        .comment-edit-form .edit-textarea {
+            width: 100%;
+            min-height: 80px;
+            padding: 10px;
+            border: 1px solid #ced4da;
+            border-radius: 4px;
+            font-family: inherit;
+            font-size: 0.95rem;
+            resize: vertical;
+            margin-bottom: 10px;
+            box-sizing: border-box;
+            transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+        }
+
+        .comment-edit-form .edit-textarea:focus {
+            border-color: #86b7fe;
+            outline: 0;
+            box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
+        }
+
+        .comment-edit-form .comment-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 8px;
+        }
+
+        .comment-actions .btn-sm {
+            padding: 0.25rem 0.5rem;
+            font-size: 0.875rem;
+            border-radius: 0.2rem;
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <h1>My Shopping Mall</h1>
+</header>
+
+<nav>
+    <div class="nav-links">
+        <a th:href="@{/}">홈</a>
+        <a th:href="@{/items}">상품 관리 페이지</a>
+        <a th:href="@{/categories}">카테고리</a>
+        <a th:href="@{/posts}">게시판</a>
+    </div>
+    <div class="user-actions">
+        <!-- 장바구니 아이콘 (항상 표시) -->
+        <a th:href="@{/items/cartAll}" class="nav-icon-link">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"></path><line x1="3" y1="6" x2="21" y2="6"></line><path d="M16 10a4 4 0 0 1-8 0"></path></svg>
+        </a>
+        <!-- 프로필 아이콘 및 드롭다운 메뉴 -->
+        <div class="profile-menu-container">
+            <button class="nav-icon-link profile-icon-btn">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+            </button>
+            <div class="dropdown-menu">
+                <!-- 로그인 안된 경우 -->
+                <div th:if="${user == null}">
+                    <a th:href="@{/login}" class="dropdown-item">로그인</a>
+                    <a th:href="@{/register}" class="dropdown-item">회원가입</a>
+                </div>
+                <!-- 로그인 된 경우 -->
+                <div th:if="${user != null}">
+                    <div class="dropdown-header" th:text="${user.name} + '님'">사용자 이름</div>
+                    <a th:href="@{/mypage}" class="dropdown-item">마이 페이지</a>
+                    <a th:href="@{/items/orderAll}" class="dropdown-item">주문 내역</a>
+                    <form th:action="@{/logout}" method="post">
+                        <button type="submit" class="dropdown-item btn-link">로그아웃</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</nav>
+
+<div class="container post-view-container">
+
+    <!-- Post Content -->
+    <div class="post-card">
+        <div class="post-header">
+            <h2 class="post-title" th:text="${post.title}">Post Title</h2>
+            <div class="post-meta">
+                <span class="author">작성자 | <strong th:text="${post.authorName}">Author</strong></span>
+                <span class="date" th:text="${#temporals.format(post.createdDate, 'yyyy-MM-dd HH:mm')}">Date</span>
+            </div>
+        </div>
+        <div class="post-content" th:text="${post.content}">
+            Post content goes here...
+        </div>
+        <div class="post-actions">
+            <a th:href="@{/posts}" class="btn btn-secondary">목록으로</a>
+            <div th:if="${loginUser != null and loginUser.name.equals(post.authorName)}" style="display: inline-block;">
+                <a th:href="@{|/posts/${post.id}/update|}" class="btn btn-primary">수정</a>
+                <form th:action="@{|/posts/${post.id}/delete|}" method="post" style="display: inline;">
+                    <button type="submit" class="btn btn-danger">삭제</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Comments Section -->
+    <div class="comments-section">
+        <h3 class="comments-title">댓글</h3>
+
+        <!-- List of Comments -->
+        <div th:if="${post.comments.isEmpty()}">
+            <p>아직 댓글이 없습니다. 첫 댓글을 남겨주세요!</p>
+        </div>
+        <div th:each="comment, iterStat : ${post.comments}" class="comment" th:id="'comment-' + ${iterStat.count}">
+            <div class="comment-meta">
+                <span class="comment-author" th:text="${comment.username}">Comment Author</span>
+                <span class="comment-date" th:text="${#temporals.format(comment.createdDate, 'yyyy-MM-dd HH:mm')}">Date</span>
+            </div>
+
+            <!-- Display Comment -->
+            <div class="comment-display">
+                <p class="comment-content" th:text="${comment.content}">Comment content.</p>
+                <div class="comment-actions" th:if="${loginUser != null and loginUser.name.equals(comment.username)}">
+                    <button type="button" class="btn btn-secondary btn-sm" onclick="toggleEditForm(this)">수정</button>
+                    <form class="comment-delete-form" th:action="@{|/posts/${post.id}/comments/${comment.id}|}" method="post" style="display: inline;">
+                        <button type="submit" class="btn btn-secondary btn-sm">삭제</button>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Edit Comment Form (Container) -->
+            <div class="comment-edit-form" th:style="${errorCommentId != null and errorCommentId == comment.id} ? 'display: block;' : 'display: none;'">
+
+                <!-- FORM 1: Render this form ONLY if it's the one with the error -->
+                <form th:if="${errorCommentId != null and errorCommentId == comment.id}"
+                      th:action="@{|/posts/${post.id}/comments/${comment.id}/update|}" method="post"
+                      th:object="${commentToUpdate}">
+
+                    <div class="field-error" th:errors="*{content}"></div>
+                    <input type="hidden" name="content" />
+                    <textarea class="edit-textarea" th:text="*{content}"></textarea> <!-- th:field를 th:text로 수정 -->
+
+                    <div class="comment-actions">
+                        <button type="button" class="btn btn-primary btn-sm" onclick="submitEditForm(this)">저장</button>
+                        <button type="button" class="btn btn-secondary btn-sm" onclick="toggleEditForm(this)">취소</button>
+                    </div>
+                </form>
+
+                <!-- FORM 2: Render this form for all non-error comments (it's normally hidden) -->
+                <form th:unless="${errorCommentId != null and errorCommentId == comment.id}"
+                      th:action="@{|/posts/${post.id}/comments/${comment.id}/update|}" method="post">
+
+                    <!-- 오류가 없는 상태이므로 th:errors가 필요 없습니다. -->
+                    <input type="hidden" name="content" />
+                    <textarea class="edit-textarea" th:text="${comment.content}"></textarea>
+
+                    <div class="comment-actions">
+                        <button type="button" class="btn btn-primary btn-sm" onclick="submitEditForm(this)">저장</button>
+                        <button type="button" class="btn btn-secondary btn-sm" onclick="toggleEditForm(this)">취소</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- New Comment Form -->
+        <div class="comment-form-container">
+            <h4 class="comments-title" style="font-size: 1.2rem; margin-bottom: 20px;">댓글 등록하기</h4>
+            <form th:action="@{|/posts/${post.id}/comments|}" method="post" th:object="${commentForm}">
+                <div>
+                    <div class="field-error" th:errors="*{content}"></div>
+                    <textarea th:field="*{content}" placeholder="댓글 내용을 여기에 입력해주세요."></textarea>
+                </div>
+                <div class="button-container">
+                    <button type="submit" class="btn btn-primary">댓글 등록하기</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+</div>
+
+<!--공통 푸터-->
+<footer th:replace="~{fragments/footer :: footer}"></footer>
+
+<div th:replace="~{fragments/script :: script}"></div>
+
+<script>
+    function toggleEditForm(button) {
+        const commentDiv = button.closest('.comment');
+        const displayDiv = commentDiv.querySelector('.comment-display');
+        const editDiv = commentDiv.querySelector('.comment-edit-form');
+
+        // 현재 수정 모드인지 확인 (editDiv가 보여지고 있는지)
+        const isEditing = editDiv.style.display !== 'none';
+
+        if (isEditing) {
+            // 수정 중일 때 -> 취소: 수정 폼을 숨기고, 댓글을 다시 보여줌
+            editDiv.style.display = 'none';
+            displayDiv.style.display = 'block';
+        } else {
+            // 수정 중이 아닐 때 -> 수정 시작: 댓글을 숨기고, 수정 폼을 보여줌
+            editDiv.style.display = 'block';
+            displayDiv.style.display = 'none';
+        }
+    }
+
+    function submitEditForm(button) {
+        const form = button.closest('form');
+        const textarea = form.querySelector('.edit-textarea');
+        // Find the hidden input and set its value
+        const hiddenInput = form.querySelector('input[name="content"]');
+        hiddenInput.value = textarea.value;
+        form.submit();
+    }
+</script>
+
+</body>
+</html>

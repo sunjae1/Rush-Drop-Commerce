@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Add to Cart</title>
+    <link rel="stylesheet" th:href="@{/style.css}">
+    <style>
+        .breadcrumbs {
+            font-size: 0.9rem;
+            color: var(--secondary-text);
+            margin-bottom: 40px;
+        }
+        .breadcrumbs a {
+            color: var(--secondary-text);
+            text-decoration: none;
+        }
+        .breadcrumbs a:hover {
+            color: var(--primary-text);
+        }
+        .cart-form-container {
+            display: flex;
+            gap: 50px;
+            align-items: flex-start;
+        }
+        .item-image-container {
+            flex: 1;
+            max-width: 450px;
+        }
+        .item-image-container img {
+            width: 100%;
+            border-radius: 8px;
+        }
+        .form-section {
+            flex: 1.2;
+        }
+        .item-name {
+            font-size: 2.2rem;
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+        .item-price {
+            font-size: 1.5rem;
+            font-weight: 500;
+            color: var(--secondary-text);
+            margin-bottom: 20px;
+        }
+        .stock-info {
+            font-size: 0.9rem;
+            color: #28a745;
+            font-weight: 500;
+            margin-bottom: 30px;
+        }
+        .quantity-selector {
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        .quantity-selector label {
+            font-weight: 500;
+            margin-right: 20px;
+        }
+        .quantity-btn {
+            width: 35px;
+            height: 35px;
+            border: 1px solid var(--border-color);
+            background-color: var(--light-gray-bg);
+            font-size: 1.2rem;
+            cursor: pointer;
+        }
+        .quantity-input {
+            width: 60px;
+            height: 35px;
+            text-align: center;
+            border: 1px solid var(--border-color);
+            border-left: none;
+            border-right: none;
+            font-size: 1rem;
+            -moz-appearance: textfield; /* Firefox */
+        }
+        .quantity-input::-webkit-outer-spin-button,
+        .quantity-input::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+        .total-price-section {
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 1.2rem;
+            font-weight: 600;
+        }
+        .total-price-value {
+            font-size: 1.8rem;
+            color: var(--accent-color);
+        }
+        .button-container {
+            margin-top: 30px;
+            display: flex;
+            gap: 15px;
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <h1>My Shopping Mall</h1>
+</header>
+
+<nav>
+    <div class="nav-links">
+        <a th:href="@{/}">홈</a>
+        <a th:href="@{/items}">상품 관리 페이지</a>
+        <a th:href="@{/categories}">카테고리</a>
+        <a th:href="@{/posts}">게시판</a>
+    </div>
+    <div class="user-actions">
+        <!-- 장바구니 아이콘 (항상 표시) -->
+        <a th:href="@{/items/cartAll}" class="nav-icon-link">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"></path><line x1="3" y1="6" x2="21" y2="6"></line><path d="M16 10a4 4 0 0 1-8 0"></path></svg>
+        </a>
+        <!-- 프로필 아이콘 및 드롭다운 메뉴 -->
+        <div class="profile-menu-container">
+            <button class="nav-icon-link profile-icon-btn">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+            </button>
+            <div class="dropdown-menu">
+                <!-- 로그인 안된 경우 -->
+                <div th:if="${user == null}">
+                    <a th:href="@{/login}" class="dropdown-item">로그인</a>
+                    <a th:href="@{/register}" class="dropdown-item">회원가입</a>
+                </div>
+                <!-- 로그인 된 경우 -->
+                <div th:if="${user != null}">
+                    <div class="dropdown-header" th:text="${user.name} + '님'">사용자 이름</div>
+                    <a th:href="@{/mypage}" class="dropdown-item">마이 페이지</a>
+                    <a th:href="@{/items/orderAll}" class="dropdown-item">주문 내역</a>
+                    <form th:action="@{/logout}" method="post">
+                        <button type="submit" class="dropdown-item btn-link">로그아웃</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</nav>
+
+<div class="container">
+
+    <div class="breadcrumbs">
+        <a th:href="@{/}">홈</a> &gt;
+        <a th:href="@{|/items/${item.id}|}" th:text="${item.itemName}">Item Name</a> &gt;
+        <span>장바구니 추가</span>
+    </div>
+
+    <div class="cart-form-container">
+        <div class="item-image-container">
+            <img th:src="@{${item.imageUrl}}" alt="Item Image">
+        </div>
+
+        <div class="form-section">
+            <h2 class="item-name" th:text="${item.itemName}">Item Name</h2>
+            <p class="item-price" th:text="${#numbers.formatInteger(item.price, 0, 'COMMA')}+ '원'">Price</p>
+            <p class="stock-info" th:text="'남은 재고: '+ ${#numbers.formatInteger(item.quantity, 0, 'COMMA')}+ '개 주문가능'">Stock Info</p>
+
+            <form th:action="@{|/items/${item.id}/cart|}" method="post">
+                <input type="hidden" name="id" th:value="${item.id}">
+                <input type="hidden" name="price" th:value="${item.price}">
+
+                <div class="quantity-selector">
+                    <label for="quantity">주문 수량</label>
+                    <button type="button" class="quantity-btn" id="btn-minus">-</button>
+                    <input type="number" id="quantity" name="quantity" value="1" min="1" th:max="${item.quantity}" class="quantity-input">
+                    <button type="button" class="quantity-btn" id="btn-plus">+</button>
+                </div>
+                <div class="field-error" th:if="${#fields.hasErrors('${cartForm.quantity}')}" th:errors="${cartForm.quantity}"></div>
+
+
+                <div class="total-price-section">
+                    <span>총 가격</span>
+                    <span id="total-price" class="total-price-value"></span>
+                </div>
+
+                <div class="button-container">
+                    <button type="submit" class="btn btn-primary" style="width: 100%; padding: 15px;">장바구니에 담기</button>
+                </div>
+                 <div style="text-align: center; margin-top: 15px;">
+                    <a th:href="@{/}" class="btn btn-secondary">취소</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!--공통 푸터-->
+<footer th:replace="~{fragments/footer :: footer}"></footer>
+
+<div th:replace="~{fragments/script :: script}"></div>
+
+<script th:inline="javascript">
+    /*<![CDATA[*/
+    const quantityInput = document.getElementById('quantity');
+    const btnPlus = document.getElementById('btn-plus');
+    const btnMinus = document.getElementById('btn-minus');
+    const totalPriceEl = document.getElementById('total-price');
+
+    const itemPrice = /*[[${item.price}]]*/ 0;
+    const maxQuantity = /*[[${item.quantity}]]*/ 1;
+
+    function updateTotal() {
+        let quantity = parseInt(quantityInput.value, 10);
+
+        if (isNaN(quantity) || quantity < 1) {
+            quantity = 1;
+            quantityInput.value = 1;
+        }
+        if (quantity > maxQuantity) {
+            quantity = maxQuantity;
+            quantityInput.value = maxQuantity;
+        }
+
+        const totalPrice = itemPrice * quantity;
+        totalPriceEl.textContent = new Intl.NumberFormat('ko-KR').format(totalPrice) + '원';
+    }
+
+    btnPlus.addEventListener('click', () => {
+        let currentVal = parseInt(quantityInput.value, 10);
+        if (currentVal < maxQuantity) {
+            quantityInput.value = currentVal + 1;
+            updateTotal();
+        }
+    });
+
+    btnMinus.addEventListener('click', () => {
+        let currentVal = parseInt(quantityInput.value, 10);
+        if (currentVal > 1) {
+            quantityInput.value = currentVal - 1;
+            updateTotal();
+        }
+    });
+
+    quantityInput.addEventListener('input', updateTotal);
+
+    // Initial calculation
+    updateTotal();
+    /*]]>*/
+</script>
+
+</body>
+</html>

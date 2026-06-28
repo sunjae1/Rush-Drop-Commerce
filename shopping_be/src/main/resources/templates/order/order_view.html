@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>주문 목록</title>
+    <link rel="stylesheet" th:href="@{/style.css}">
+</head>
+<body>
+
+<div class="container">
+    <header>
+        <h1>주문 목록</h1>
+    </header>
+
+    <div class="order-view-container">
+        <table class="order-table">
+            <thead>
+                <tr>
+                    <th>주문 ID</th>
+                    <th>주문 상세</th>
+                    <th>총 주문 수량</th>
+                    <th>총 주문 금액</th>
+                    <th>주문 일시</th>
+                    <th>상태</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr th:each="order : ${orders}">
+                    <td th:text="${order.id}">1</td>
+                    <td>
+                        <ul class="order-item-details">
+                            <li th:each="oi : ${order.orderItems}" 
+                                th:text="${oi.itemName} + ' ' + ${oi.quantity} + '개'">
+                                상품명 1개
+                            </li>
+                        </ul>
+                    </td>
+                    <td th:text="${order.totalQuantity}">2</td>
+                    <td th:text="${#numbers.formatDecimal(order.totalPrice, 0, 'COMMA', 0, 'POINT')} + '원'">20,000원</td>
+                    <td th:text="${#temporals.format(order.orderDate, 'yyyy-MM-dd HH:mm')}">2023-10-26 10:30</td>
+                    <td>
+                        <span class="order-status" 
+                              th:classappend="${order.status.name() == 'PAID' ? 'order-status-ORDER' : 'order-status-CANCEL'}"
+                              th:text="${order.status.name()}">ORDER
+                        </span>
+                    </td>
+
+<!--                    -->
+                    <td>
+                        <form th:if="${order.orderIsNotCanCelled and loginUser != null and loginUser.id == order.user.id}"
+                              th:action="@{|/items/${order.id}/cancel|}" method="post">
+                            <button type="submit" class="btn btn-secondary">주문 취소</button>
+                        </form>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div class="page-footer-link">
+        <a th:href="@{/}" class="btn btn-primary">메인 페이지로</a>
+    </div>
+</div>
+
+</body>
+</html>

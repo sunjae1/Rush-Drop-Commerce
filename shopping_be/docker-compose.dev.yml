@@ -1,0 +1,39 @@
+services:
+  redis:
+    image: redis:7-alpine
+    container_name: shopping-redis-dev
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis-data:/data
+
+  app:
+    image: gradle:8.12-jdk21
+    container_name: shopping-app-dev
+    working_dir: /workspace
+    command: gradle bootRun --continuous --no-daemon
+    ports:
+      - "8080:8080"
+    env_file:
+      - ./.env
+    environment:
+      SPRING_PROFILES_ACTIVE: dev
+      REDIS_HOST: redis
+      GRADLE_USER_HOME: /home/gradle/.gradle
+      SPRING_DEVTOOLS_RESTART_ENABLED: "true"
+      SPRING_DEVTOOLS_RESTART_POLL_INTERVAL: 2s
+      SPRING_DEVTOOLS_RESTART_QUIET_PERIOD: 1s
+      SPRING_DEVTOOLS_LIVERELOAD_ENABLED: "true"
+    volumes:
+      - ./:/workspace
+      - gradle-cache:/home/gradle/.gradle
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    stdin_open: true
+    tty: true
+    depends_on:
+      - redis
+
+volumes:
+  gradle-cache:
+  redis-data:

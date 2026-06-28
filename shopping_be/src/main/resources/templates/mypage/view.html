@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>My Page</title>
+    <link rel="stylesheet" th:href="@{/style.css}">
+
+    <style>
+        .mypage-container {
+                    margin-top: 30px;
+                }
+                .section-card {
+                    background-color: #fff;
+                    border-radius: 8px;
+                    padding: 30px;
+                    margin-bottom: 30px;
+                    box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+                }
+                .section-title {
+                    font-size: 1.5rem;
+                    font-weight: 600;
+                    margin-bottom: 25px;
+                    padding-bottom: 15px;
+                    border-bottom: 1px solid var(--border-color);
+                }
+                .account-info p {
+                    font-size: 1rem;
+                    color: var(--secondary-text);
+                    margin-bottom: 10px;
+                }
+                .account-info strong {
+                    color: var(--primary-text);
+                    min-width: 100px;
+                    display: inline-block;
+                }
+                .table-responsive {
+                    overflow-x: auto;
+                }
+                .order-table th, .order-table td {
+                    white-space: nowrap;
+                }
+                .empty-section {
+                    text-align: center;
+                    padding: 40px;
+                    color: var(--secondary-text);
+                }
+                .cart-summary-card {
+                    display: flex;
+                    justify-content: space-between;
+                    align-items: center;
+                }
+                .cart-summary-text p {
+                    margin: 0;
+                    font-size: 1.1rem;
+                }
+                .cart-summary-text span {
+                    font-weight: 600;
+                    color: var(--accent-color);
+                }
+    </style>
+
+</head>
+<body>
+
+<header>
+    <h1>My Shopping Mall</h1>
+</header>
+
+<nav>
+    <div class="nav-links">
+        <a th:href="@{/}">홈</a>
+        <a th:href="@{/items}">상품 관리 페이지</a>
+        <a th:href="@{/categories}">카테고리</a>
+        <a th:href="@{/posts}">게시판</a>
+    </div>
+    <div class="user-actions">
+        <!-- 장바구니 아이콘 (항상 표시) -->
+        <a th:href="@{/items/cartAll}" class="nav-icon-link">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"></path><line x1="3" y1="6" x2="21" y2="6"></line><path d="M16 10a4 4 0 0 1-8 0"></path></svg>
+        </a>
+        <!-- 프로필 아이콘 및 드롭다운 메뉴 -->
+        <div class="profile-menu-container">
+            <button class="nav-icon-link profile-icon-btn">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+            </button>
+            <div class="dropdown-menu">
+                <!-- 로그인 안된 경우 -->
+                <div th:if="${user == null}">
+                    <a th:href="@{/login}" class="dropdown-item">로그인</a>
+                    <a th:href="@{/register}" class="dropdown-item">회원가입</a>
+                </div>
+                <!-- 로그인 된 경우 -->
+                <div th:if="${user != null}">
+                    <div class="dropdown-header" th:text="${user.name} + '님'">사용자 이름</div>
+                    <a th:href="@{/mypage}" class="dropdown-item">마이 페이지</a>
+                    <a th:href="@{/items/orderAll}" class="dropdown-item">주문 내역</a>
+                    <form th:action="@{/logout}" method="post">
+                        <button type="submit" class="dropdown-item btn-link">로그아웃</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</nav>
+
+<div class="container mypage-container">
+
+    <!-- Account Information -->
+    <section class="section-card account-info">
+        <h2 class="section-title" th:text="|환영합니다, ${user.name}님!|">Welcome, User!</h2>
+        <p><strong>아이디:</strong> <span th:text="${user.id}"></span></p>
+        <p><strong>이름:</strong> <span th:text="${user.name}"></span></p>
+        <p><strong>이메일:</strong> <span th:text="${user.email}"></span></p>
+    </section>
+
+    <!-- My Orders -->
+    <section class="section-card">
+        <h2 class="section-title">나의 주문 내역</h2>
+        <div th:if="${orders == null or orders.isEmpty()}" class="empty-section">
+            <p>주문 내역이 없습니다.</p>
+        </div>
+        <div th:if="${orders != null and !orders.isEmpty()}" class="table-responsive">
+            <table class="order-table">
+                <thead>
+                <tr>
+                    <th>주문번호</th>
+                    <th>주문 상품</th>
+                    <th>총 수량</th>
+                    <th>총 금액</th>
+                    <th>주문일자</th>
+                    <th>상태</th>
+                    <th></th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="order : ${orders}">
+                    <td th:text="${order.id}">1</td>
+                    <td>
+                        <ul class="order-item-details">
+                            <li th:each="oi : ${order.orderItems}" th:text="|${oi.itemName} (${oi.orderPrice}원 x ${oi.quantity})|">
+                                Product Name (Price x Count)
+                            </li>
+                        </ul>
+                    </td>
+                    <td th:text="${order.getTotalQuantity()} + '개'">Total Quantity</td>
+                    <td th:text="${#numbers.formatInteger(order.getTotalPrice(), 0, 'COMMA')}+ '원'">Total Price</td>
+                    <td th:text="${#temporals.format(order.orderDate, 'yyyy-MM-dd')}">Order Date</td>
+                    <td><span class="order-status"
+                              th:classappend="${order.status.name() == 'PAID' ? 'order-status-ORDER' : 'order-status-CANCEL'}"
+                              th:text="${order.status}">Status</span></td>
+                    <td th:if="${order.orderIsNotCanCelled}">
+                        <form th:action="@{|/items/${order.id}/cancel|}" method="post">
+                            <input type="hidden" name="redirectInfo" value="mypage">
+                            <button type="submit" class="btn btn-secondary btn-sm">주문 취소</button>
+                        </form>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </section>
+
+    <!-- My Posts -->
+    <section class="section-card">
+        <h2 class="section-title">내 게시글</h2>
+        <div th:if="${posts == null or posts.isEmpty()}" class="empty-section">
+            <p>작성한 게시글이 없습니다.</p>
+        </div>
+        <div th:if="${posts != null and !posts.isEmpty()}" class="table-responsive">
+            <table class="order-table">
+                <thead>
+                <tr>
+                    <th>제목</th>
+                    <th>작성일</th>
+                    <th></th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="post : ${posts}">
+                    <td><a th:href="@{|/posts/${post.id}|}" th:text="${post.title}">Post Title</a></td>
+                    <td th:text="${#temporals.format(post.createdDate, 'yyyy-MM-dd HH:mm')}">Created Date</td>
+                    <td>
+                        <form th:action="@{|/posts/${post.id}/delete|}" method="post">
+                            <input type="hidden" name="redirectInfo" value="mypage">
+                            <button type="submit" class="btn btn-secondary btn-sm">삭제</button>
+                        </form>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </section>
+
+    <!-- Cart Summary -->
+    <section class="section-card cart-summary-card">
+        <div class="cart-summary-text">
+            <h2 class="section-title" style="border: none; margin: 0; padding: 0;">장바구니</h2>
+            <div th:if="${cart != null and !#lists.isEmpty(cart.cartItems)}">
+                <p>총 <span th:text="${cart.cartItems.size()}"></span>개의 상품이 담겨 있습니다.</p>
+            </div>
+            <div th:if="${cart == null or #lists.isEmpty(cart.cartItems)}">
+                <p>장바구니가 비어 있습니다.</p>
+            </div>
+        </div>
+        <a th:href="@{/items/cartAll}" class="btn btn-primary">장바구니 보기</a>
+    </section>
+
+</div>
+
+<!--공통 푸터-->
+<footer th:replace="~{fragments/footer :: footer}"></footer>
+
+<div th:replace="~{fragments/script :: script}"></div>
+
+</body>
+</html>

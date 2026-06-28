@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title th:text="${item.name} + ' - Product Details'">Product Details</title>
+    <link rel="stylesheet" th:href="@{/style.css}">
+    <style>
+        .page-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 30px;
+            margin-bottom: 15px;
+        }
+        .breadcrumbs {
+            font-size: 0.9rem;
+            color: var(--secondary-text);
+        }
+        .breadcrumbs a {
+            color: var(--secondary-text);
+            text-decoration: none;
+        }
+        .breadcrumbs a:hover {
+            color: var(--primary-text);
+        }
+        .product-detail-card {
+            display: flex;
+            gap: 50px;
+            margin-top: 20px;
+            padding: 40px;
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+        }
+        .product-image-main {
+            flex: 1;
+            max-width: 450px;
+        }
+        .product-image-main img {
+            width: 100%;
+            border-radius: 8px;
+        }
+        .product-info-main {
+            flex: 1.2;
+            display: flex;
+            flex-direction: column;
+        }
+        .product-name {
+            font-size: 2.2rem;
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+        .product-id {
+            font-size: 0.9rem;
+            color: var(--secondary-text);
+            margin-bottom: 25px;
+        }
+        .product-id .badge {
+            background-color: var(--light-gray-bg);
+            padding: 4px 8px;
+            border-radius: 5px;
+            font-weight: 500;
+        }
+        .info-section {
+            margin-bottom: 25px;
+        }
+        .info-section h3 {
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid var(--border-color);
+        }
+        .info-section p {
+            font-size: 1.5rem;
+            font-weight: 500;
+        }
+        .info-section .price {
+             color: var(--accent-color);
+        }
+        .admin-actions {
+            margin-top: auto;
+            padding-top: 20px;
+            border-top: 1px solid var(--border-color);
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            justify-content: flex-end;
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <h1>My Shopping Mall</h1>
+</header>
+
+<nav>
+    <div class="nav-links">
+        <a th:href="@{/}">홈</a>
+        <a th:href="@{/items}">상품 관리 페이지</a>
+        <a th:href="@{/categories}">카테고리</a>
+        <a th:href="@{/posts}">게시판</a>
+    </div>
+    <div class="user-actions">
+        <!-- 장바구니 아이콘 (항상 표시) -->
+        <a th:href="@{/items/cartAll}" class="nav-icon-link">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"></path><line x1="3" y1="6" x2="21" y2="6"></line><path d="M16 10a4 4 0 0 1-8 0"></path></svg>
+        </a>
+        <!-- 프로필 아이콘 및 드롭다운 메뉴 -->
+        <div class="profile-menu-container">
+            <button class="nav-icon-link profile-icon-btn">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+            </button>
+            <div class="dropdown-menu">
+                <!-- 로그인 안된 경우 -->
+                <div th:if="${user == null}">
+                    <a th:href="@{/login}" class="dropdown-item">로그인</a>
+                    <a th:href="@{/register}" class="dropdown-item">회원가입</a>
+                </div>
+                <!-- 로그인 된 경우 -->
+                <div th:if="${user != null}">
+                    <div class="dropdown-header" th:text="${user.name} + '님'">사용자 이름</div>
+                    <a th:href="@{/mypage}" class="dropdown-item">마이 페이지</a>
+                    <a th:href="@{/items/orderAll}" class="dropdown-item">주문 내역</a>
+                    <form th:action="@{/logout}" method="post">
+                        <button type="submit" class="dropdown-item btn-link">로그아웃</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</nav>
+
+<div class="container">
+
+    <div class="page-header">
+        <div class="breadcrumbs">
+            <a th:href="@{/items}">관리자용 상품 관리 페이지</a> &gt;
+            <span th:text="${item.name}">Product Name</span>
+        </div>
+    </div>
+
+    <div class="product-detail-card">
+        <!-- Left Column: Image -->
+        <div class="product-image-main">
+            <img th:src="@{${item.imageUrl}}" alt="Product Image">
+        </div>
+
+        <!-- Right Column: Details -->
+        <div class="product-info-main">
+            <div>
+                <h2 class="product-name" th:text="${item.name}">Product Name</h2>
+                <p class="product-id">
+                    상품 ID: <span class="badge" th:text="${item.id}">1</span>
+                </p>
+
+                <div class="info-section">
+                    <h3>가격</h3>
+                    <p class="price" th:text="${#numbers.formatInteger(item.price, 0, 'COMMA')}+ '원'">100,000원</p>
+                </div>
+
+                <div class="info-section">
+                    <h3>재고</h3>
+                    <p th:text="${#numbers.formatInteger(item.quantity, 0, 'COMMA')}+ '개'">10 units</p>
+                </div>
+
+                <div class="info-section">
+                    <h3>카테고리</h3>
+                    <p th:text="${item.categoryName != null ? item.categoryName : '미분류'}">미분류</p>
+                </div>
+            </div>
+
+            <div class="admin-actions">
+                <a th:href="@{/items}" class="btn btn-secondary">목록으로</a>
+                <a th:href="@{|/items/${item.id}/edit|}" class="btn btn-secondary">상품 수정</a>
+                <form th:action="@{|/items/${item.id}/delete|}" method="post" onsubmit="return confirm('Are you sure you want to delete this item?');">
+                    <button type="submit" class="btn btn-danger">상품 삭제</button> <!-- .btn-danger for destructive actions -->
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!--공통 푸터-->
+<footer th:replace="~{fragments/footer :: footer}"></footer>
+
+<div th:replace="~{fragments/script :: script}"></div>
+
+</body>
+</html>

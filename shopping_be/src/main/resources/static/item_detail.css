@@ -1,0 +1,145 @@
+/* Import Google Font */
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&display=swap');
+
+/* General Body Styling */
+body {
+    font-family: 'Noto Sans KR', sans-serif;
+    background-color: #fdfdff; /* Slightly off-white background */
+    color: #2c3e50; /* Darker, softer text color */
+    margin: 0;
+    padding: 20px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+/* Item Container with Gradient Border Effect */
+.item-container {
+    background: #ffffff;
+    padding: 35px 45px;
+    border-radius: 12px; /* Softer corners */
+    box-shadow: 0 10px 30px rgba(41, 128, 185, 0.1); /* More subtle, colored shadow */
+    width: 100%;
+    max-width: 650px;
+    position: relative;
+    overflow: hidden; /* Needed for pseudo-element */
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.item-container:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 15px 35px rgba(41, 128, 185, 0.15);
+}
+
+/* Item Title */
+.item-title {
+    font-size: 2.8rem;
+    font-weight: 700;
+    color: #2980b9; /* A nice blue */
+    margin-bottom: 25px;
+    text-align: center;
+    border-bottom: 2px solid #ecf0f1; /* Lighter border */
+    padding-bottom: 20px;
+}
+
+/* Details Section */
+.item-details {
+    margin-top: 30px;
+}
+
+.detail-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px 5px;
+    border-bottom: 1px solid #f8f9fa;
+    transition: background-color 0.3s ease;
+}
+
+.detail-row:last-child {
+    border-bottom: none;
+}
+
+.detail-row:hover {
+    background-color: #f8f9fa;
+    border-radius: 5px;
+}
+
+.detail-label {
+    font-weight: 500;
+    color: #34495e; /* Slightly muted label color */
+    flex-basis: 30%;
+}
+
+.detail-value {
+    font-weight: 400;
+    color: #2c3e50;
+    flex-basis: 70%;
+    text-align: right;
+    font-size: 1.1rem;
+}
+
+/* Button Container */
+.button-container {
+    margin-top: 40px;
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+}
+
+/* General Button Styling */
+.btn {
+    padding: 12px 25px;
+    border: 2px solid transparent;
+    border-radius: 8px;
+    font-size: 16px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    position: relative;
+    overflow: hidden;
+}
+
+/* Edit Button */
+.btn-edit {
+    background-color: #f39c12; /* Amber color */
+    color: #ffffff;
+}
+
+.btn-edit:hover {
+    background-color: #e67e22;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 10px rgba(243, 156, 18, 0.3);
+}
+
+/* List Button */
+.btn-list {
+    background-color: transparent;
+    color: #3498db; /* Blue text */
+    border-color: #3498db;
+}
+
+.btn-list:hover {
+    background-color: #3498db;
+    color: #ffffff;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 10px rgba(52, 152, 219, 0.3);
+}
+
+/* Image container */
+.item-image-container {
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+.item-image {
+    max-width: 100%;
+    height: auto;
+    border-radius: 8px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+}

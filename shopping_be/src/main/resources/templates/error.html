@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Error</title>
+    <link rel="stylesheet" href="/error.css">
+</head>
+
+<body>
+    <div class="container">
+        <h1>Oops!</h1>
+        <h2>알 수 없는 오류가 발생했습니다</h2>
+        <p th:if="${errorMessage}" th:text="${errorMessage}"></p>
+        <p th:unless="${errorMessage}">요청을 처리하는 중에 문제가 발생했습니다.</p>
+        <a href="/">메인 페이지로 돌아가기</a>
+    </div>
+</body>
+
+</html>

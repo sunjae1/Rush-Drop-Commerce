@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>My Shopping Mall</title>
+    <link rel="stylesheet" th:href="@{/style.css}">
+</head>
+<body>
+
+<header th:replace="~{fragments/header :: header}"></header>
+
+<nav th:replace="~{fragments/nav :: nav}"></nav>
+
+<div class="container search-form-container">
+    <div class="catalog-toolbar">
+        <div class="category-filter-bar">
+            <a th:href="@{/(keyword=${param.keyword})}"
+               th:classappend="${param.categoryId == null} ? ' active' : ''"
+               class="category-filter-chip">전체</a>
+            <a th:each="category : ${categories}"
+               th:href="@{/(categoryId=${category.id}, keyword=${param.keyword})}"
+               th:classappend="${param.categoryId != null and param.categoryId[0] == #strings.toString(category.id)} ? ' active' : ''"
+               class="category-filter-chip"
+               th:text="${category.name}">카테고리</a>
+        </div>
+
+        <form th:action="@{/}" method="get" class="search-form">
+            <input type="hidden" name="categoryId" th:value="${param.categoryId}">
+            <input type="text" name="keyword" th:value="${param.keyword}" placeholder="상품 이름 검색">
+            <button type="submit" class="btn btn-search">검색</button>
+        </form>
+    </div>
+</div>
+
+<div class="container">
+    <p class="field-error" th:if="${errorPV}" th:text="${errorPV}"></p>
+
+    <h2 class="text-center mt-20">Featured Products</h2>
+
+    <div class="product-grid">
+        <!-- Dynamically loaded products -->
+        <div class="product-card" th:each="item : ${items}">
+            <a th:href="@{|/items/${item.id}/cart|}">
+                <img th:src="@{${item.imageUrl}}" alt="Product Image">
+                <div class="product-card-info">
+                    <h3 th:text="${item.itemName}">Product Name</h3>
+                    <p th:text="${#numbers.formatInteger(item.price, 0, 'COMMA')}+ '원'">Price</p>
+                    <p th:text="'남은 수량 :'+ ${#numbers.formatInteger(item.quantity, 0, 'COMMA')}+ '개'">Quantity</p>
+                </div>
+            </a>
+            <a th:href="@{|/items/${item.id}/cart|}" class="btn btn-primary">장바구니에 담기</a>
+        </div>
+    </div>
+
+
+
+</div>
+<!--공통 푸터-->
+<footer th:replace="~{fragments/footer :: footer}"></footer>
+
+<div th:replace="~{fragments/script :: script}"></div>
+</body>
+</html>
